@@ -1,206 +1,225 @@
-WordPress .htaccess for Maximum Speed, Security & SEO
-A production-grade .htaccess file for WordPress — meticulously optimized for performance, security, Core Web Vitals, and SEO. This version (v1.0.1) integrates state-of-the-art caching, GZIP compression, modern HTTP security headers, robust bot blocking, and optional hotlink protection right out of the box.
+# WordPress .htaccess for Maximum Speed, Security & SEO
 
-🚀 Key Features & Benefits
-🔐 Enhanced Security Headers: Implements a comprehensive suite of modern HTTP security headers (HSTS, Content-Security-Policy, Permissions-Policy, Referrer-Policy, X-Frame-Options, X-XSS-Protection, X-Content-Type-Options) to fortify your WordPress site against common web vulnerabilities.
+A production-grade `.htaccess` file for WordPress — meticulously optimized for **performance**, **security**, **Core Web Vitals**, and **SEO**. This version (`v1.0.1`) integrates state-of-the-art caching, GZIP compression, modern HTTP security headers, robust bot blocking, and optional hotlink protection right out of the box.
 
-🚫 Advanced Bot & Vulnerability Blocking: Includes proactive rules to block common nuisance requests, known vulnerability scans (e.g., xmlrpc.php, readme.html), and suspicious attempts to access sensitive files within your WordPress installation.
+---
 
-⚡ Intelligent Browser Caching: Leverages mod_expires and Cache-Control headers to set aggressive, long-term browser caching for static assets (CSS, JS, images, fonts). This significantly improves loading times for repeat visitors and reduces server load.
+## 🚀 Key Features & Benefits
 
-🗜️ Optimized GZIP Compression: Configures mod_deflate to efficiently compress text-based content, reducing bandwidth usage and accelerating content delivery to user browsers. Includes support for modern image formats like AVIF.
+* 🔐 **Enhanced Security Headers**: Implements a comprehensive suite of modern HTTP security headers (`HSTS`, `Content-Security-Policy`, `Permissions-Policy`, `Referrer-Policy`, `X-Frame-Options`, `X-XSS-Protection`, `X-Content-Type-Options`) to fortify your WordPress site against common web vulnerabilities.
 
-🖼️ Optional Hotlink Protection: Provides a commented-out section to prevent other websites from directly embedding your images, thereby saving your bandwidth and server resources. Requires configuration.
+* 🚫 **Advanced Bot & Vulnerability Blocking**: Includes proactive rules to block common nuisance requests, known vulnerability scans (e.g., `xmlrpc.php`, `readme.html`), and suspicious attempts to access sensitive files within your WordPress installation.
 
-🌐 CDN & Cross-Origin Font Support: Properly configured Cross-Origin Resource Sharing (CORS) headers (Access-Control-Allow-Origin) ensure seamless integration with Content Delivery Networks (CDNs) and correct loading of web fonts from external sources.
+* ⚡ **Intelligent Browser Caching**: Leverages `mod_expires` and `Cache-Control` headers to set aggressive, long-term browser caching for static assets (CSS, JS, images, fonts). This significantly improves loading times for repeat visitors and reduces server load.
 
-📈 Improved Core Web Vitals: Directly contributes to better scores on Google PageSpeed Insights and a superior overall user experience, which are critical factors for search engine rankings and SEO performance.
+* 🗜️ **Optimized GZIP Compression**: Configures `mod_deflate` to efficiently compress text-based content, reducing bandwidth usage and accelerating content delivery to user browsers. Includes support for modern image formats like AVIF.
 
-✅ Why Choose This .htaccess?
-Drop-in Solution: Offers a ready-to-use, secure, and performant .htaccess preset, designed to minimize common misconfigurations and streamline deployment.
+* 🖼️ **Optional Hotlink Protection**: Provides a commented-out section to prevent other websites from directly embedding your images, thereby saving your bandwidth and server resources. *Requires configuration.*
 
-SEO Advantage: Directly impacts site speed and user experience, both of which are vital ranking signals for major search engines like Google.
+* 🌐 **CDN & Cross-Origin Font Support**: Properly configured Cross-Origin Resource Sharing (CORS) headers (`Access-Control-Allow-Origin`) ensure seamless integration with Content Delivery Networks (CDNs) and correct loading of web fonts from external sources.
 
-Robust Hardening: Provides a strong foundational layer of defense for your WordPress installation against automated threats, malicious bots, and targeted exploits.
+* 📈 **Improved Core Web Vitals**: Directly contributes to better scores on Google PageSpeed Insights and a superior overall user experience, which are critical factors for search engine rankings and SEO performance.
 
-Broad Compatibility: Engineered to work effectively across various Apache environments, including common proxy setups such as Apache + NGINX (e.g., Cloudways) and LiteSpeed Web Servers.
+---
 
-💻 Compatibility & Requirements
-This .htaccess configuration has been tested and validated with:
+## ✅ Why Choose This .htaccess?
 
-✅ Apache 2.4+
+* **Drop-in Solution**: Offers a ready-to-use, secure, and performant `.htaccess` preset, designed to minimize common misconfigurations and streamline deployment.
 
-✅ LiteSpeed Web Server
+* **SEO Advantage**: Directly impacts site speed and user experience, both of which are vital ranking signals for major search engines like Google.
 
-✅ Plesk (Apache + NGINX configurations)
+* **Robust Hardening**: Provides a strong foundational layer of defense for your WordPress installation against automated threats, malicious bots, and targeted exploits.
 
-✅ Cloudways (Apache + NGINX reverse proxy + Varnish caching stacks)
+* **Broad Compatibility**: Engineered to work effectively across various Apache environments, including common proxy setups such as Apache + NGINX (e.g., Cloudways) and LiteSpeed Web Servers.
 
-Required Apache Modules: For full functionality, ensure the following Apache modules are enabled on your server: mod_rewrite, mod_headers, mod_deflate, mod_alias, mod_expires.
+---
 
-Tested with Popular WordPress Themes
-This .htaccess configuration has been tested for compatibility with the following popular WordPress themes, ensuring no known conflicts or performance regressions:
+## 💻 Compatibility & Requirements
 
-Blocksy
+This `.htaccess` configuration has been tested and validated with:
 
-Astra
+* ✅ **Apache 2.4+**
 
-Neve
+* ✅ **LiteSpeed** Web Server
 
-Kadence
+* ✅ **Plesk** (Apache + NGINX configurations)
 
-GeneratePress (Added as it's a popular choice often paired with builders)
+* ✅ **Cloudways** (Apache + NGINX reverse proxy + Varnish caching stacks)
 
-OceanWP (Added as a popular multipurpose theme)
+> **Required Apache Modules**: For full functionality, ensure the following Apache modules are enabled on your server: `mod_rewrite`, `mod_headers`, `mod_deflate`, `mod_alias`, `mod_expires`.
 
-Storefront (WooCommerce default)
+### Tested with Popular WordPress Themes
 
-WoodMart
+This `.htaccess` configuration has been tested for compatibility with the following popular WordPress themes, ensuring no known conflicts or performance regressions:
 
-Twenty Twenty-Four (Latest default WordPress theme)
+* **Blocksy**
 
-Twenty Twenty-Three (Previous default WordPress theme)
+* **Astra**
 
-Hello Elementor (Often used with Elementor Pro)
+* **Neve**
 
-Tested with Popular WordPress Plugins
-This .htaccess configuration has been tested for compatibility with the following widely used WordPress plugins, verifying their proper functioning alongside the server-level optimizations:
+* **Kadence**
 
-Elementor (Page Builder)
+* **GeneratePress** (Added as it's a popular choice often paired with builders)
 
-WoodMart Core (Theme-specific plugin, assuming general compatibility for similar)
+* **OceanWP** (Added as a popular multipurpose theme)
 
-WooCommerce (eCommerce platform)
+* **Storefront** (WooCommerce default)
 
-WP All Import / WP All Export (Data migration)
+* **WoodMart**
 
-WPML (Multilingual plugin)
+* **Twenty Twenty-Four** (Latest default WordPress theme)
 
-Yoast SEO (SEO optimization)
+* **Twenty Twenty-Three** (Previous default WordPress theme)
 
-Rank Math SEO (Alternative SEO optimization)
+* **Hello Elementor** (Often used with Elementor Pro)
 
-LiteSpeed Cache (Caching plugin, if LiteSpeed server is used)
+### Tested with Popular WordPress Plugins
 
-WP Super Cache / W3 Total Cache (Other popular caching plugins)
+This `.htaccess` configuration has been tested for compatibility with the following widely used WordPress plugins, verifying their proper functioning alongside the server-level optimizations:
 
-Smush / Imagify (Image optimization plugins)
+* **Elementor** (Page Builder)
 
-Note on Performance Plugins (e.g., WP Rocket, Perfmatters):
-This .htaccess provides server-level optimizations. Many performance plugins (like WP Rocket, Perfmatters) add their own caching, minification, and .htaccess rules. When using such plugins, it's crucial to:
+* **WoodMart Core** (Theme-specific plugin, assuming general compatibility for similar)
 
-Test thoroughly: Ensure no conflicts arise from overlapping optimizations (e.g., double compression, conflicting caching directives).
+* **WooCommerce** (eCommerce platform)
 
-Review plugin settings: Often, these plugins have options to disable server-level optimizations if they are already handled by your .htaccess or CDN. Consult their official documentation for best integration practices.
+* **WP All Import** / **WP All Export** (Data migration)
 
-Cloudflare Compatibility
-This .htaccess is designed to work seamlessly with Cloudflare, enhancing your site's performance and security when used in conjunction with their CDN and WAF services.
+* **WPML** (Multilingual plugin)
 
-Key considerations for Cloudflare integration:
+* **Yoast SEO** (SEO optimization)
 
-Caching: Cloudflare's caching often supersedes server-level caching. Ensure your Cloudflare caching settings are configured appropriately (e.g., set Caching Level to "Standard" or "Aggressive") and test the results.
+* **Rank Math SEO** (Alternative SEO optimization)
 
-Compression (Brotli/GZIP): Cloudflare provides its own Brotli and GZIP compression. While this .htaccess enables GZIP at the server level, Cloudflare will typically handle compression before it reaches your server, or re-compress if necessary. It's generally safe to keep mod_deflate enabled in .htaccess as a fallback.
+* **LiteSpeed Cache** (Caching plugin, if LiteSpeed server is used)
 
-Security Headers: Cloudflare offers various security headers (e.g., HSTS, Content Security Policy) through its dashboard. If you enable these via Cloudflare, they will override or work in conjunction with the headers defined in this .htaccess. It's recommended to configure them in Cloudflare for centralized management, but keeping them in .htaccess provides a robust fallback.
+* **WP Super Cache** / **W3 Total Cache** (Other popular caching plugins)
 
-Firewall Rules: Cloudflare's WAF (Web Application Firewall) and custom firewall rules can provide additional layers of protection. Ensure any custom Cloudflare rules don't conflict with the blocking rules in this .htaccess.
+* **Smush** / **Imagify** (Image optimization plugins)
+
+> **Note on Performance Plugins (e.g., WP Rocket, Perfmatters):**
+> This `.htaccess` provides server-level optimizations. Many performance plugins (like WP Rocket, Perfmatters) add their own caching, minification, and `.htaccess` rules. When using such plugins, it's crucial to:
+>
+> 1. **Test thoroughly**: Ensure no conflicts arise from overlapping optimizations (e.g., double compression, conflicting caching directives).
+>
+> 2. **Review plugin settings**: Often, these plugins have options to disable server-level optimizations if they are already handled by your `.htaccess` or CDN. Consult their official documentation for best integration practices.
+
+### Cloudflare Compatibility
+
+This `.htaccess` is designed to work seamlessly with Cloudflare, enhancing your site's performance and security when used in conjunction with their CDN and WAF services.
+
+**Key considerations for Cloudflare integration:**
+
+* **Caching**: Cloudflare's caching often supersedes server-level caching. Ensure your Cloudflare caching settings are configured appropriately (e.g., set `Caching Level` to "Standard" or "Aggressive") and test the results.
+
+* **Compression (Brotli/GZIP)**: Cloudflare provides its own Brotli and GZIP compression. While this `.htaccess` enables GZIP at the server level, Cloudflare will typically handle compression before it reaches your server, or re-compress if necessary. It's generally safe to keep `mod_deflate` enabled in `.htaccess` as a fallback.
+
+* **Security Headers**: Cloudflare offers various security headers (e.g., HSTS, Content Security Policy) through its dashboard. If you enable these via Cloudflare, they will override or work in conjunction with the headers defined in this `.htaccess`. It's recommended to configure them in Cloudflare for centralized management, but keeping them in `.htaccess` provides a robust fallback.
+
+* **Firewall Rules**: Cloudflare's WAF (Web Application Firewall) and custom firewall rules can provide additional layers of protection. Ensure any custom Cloudflare rules don't conflict with the blocking rules in this `.htaccess`.
 
 For optimal performance with Cloudflare, consult Cloudflare's official documentation for WordPress and WooCommerce optimization.
 
-🛠 Installation Guide
-Backup: Crucially, create a full backup of your existing .htaccess file before making any modifications.
+## 🛠 Installation Guide
 
-Replace: Copy the entire content from this repository's .htaccess file and paste it into your WordPress site's root .htaccess file (typically located in your public_html directory).
+1. **Backup**: **Crucially**, create a full backup of your existing `.htaccess` file *before* making any modifications.
 
-Hotlink Protection (Optional): If you choose to enable the hotlink protection section, remember to replace yourdomain\.com with your actual domain name (e.g., yourwebsite\.com, myblog\.net).
+2. **Replace**: Copy the entire content from this repository's `.htaccess` file and paste it into your WordPress site's root `.htaccess` file (typically located in your public_html directory).
 
-Wordfence Integration: If your site uses the Wordfence Security plugin, navigate to your WordPress Admin Dashboard → Wordfence → Firewall → and click on "Optimize Firewall". This step ensures Wordfence automatically prepends its Web Application Firewall (WAF) rules, preventing conflicts.
+3. **Hotlink Protection (Optional)**: If you choose to enable the hotlink protection section, remember to **replace `yourdomain\.com`** with your actual domain name (e.g., `yourwebsite\.com`, `myblog\.net`).
 
-Cloudways Specific Note: For sites hosted on Cloudways, do NOT enable the HTTP to HTTPS redirection block within this .htaccess file. Cloudways automatically manages SSL redirection via its platform's SSL panel, and enabling it here can lead to conflicts or redirect loops.
+4. **Wordfence Integration**: If your site uses the **Wordfence Security plugin**, navigate to your WordPress Admin Dashboard → *Wordfence → Firewall* → and click on **"Optimize Firewall"**. This step ensures Wordfence automatically prepends its Web Application Firewall (WAF) rules, preventing conflicts.
 
-Test & Verify: After implementation, thoroughly test your website to ensure all functionalities are working as expected. Validate your security headers and performance metrics using external tools such as securityheaders.com and Google PageSpeed Insights.
+5. **Cloudways Specific Note**: For sites hosted on **Cloudways**, **do NOT enable the HTTP to HTTPS redirection block** within this `.htaccess` file. Cloudways automatically manages SSL redirection via its platform's SSL panel, and enabling it here can lead to conflicts or redirect loops.
 
-🔄 How to Update This GitHub Repository
-Maintaining an optimized .htaccess file is an ongoing process. Follow these steps to contribute or keep your local copy updated with the latest best practices:
+6. **Test & Verify**: After implementation, thoroughly test your website to ensure all functionalities are working as expected. Validate your security headers and performance metrics using external tools such as [securityheaders.com](https://securityheaders.com) and [Google PageSpeed Insights](https://pagespeed.web.dev/).
 
-Clone/Fork the Repository:
+## 🔄 How to Update This GitHub Repository
 
-If you haven't already, fork this repository to your GitHub account or clone it locally:
-git clone https://github.com/zygimantasj/wordpress-htaccess-optimized.git
+Maintaining an optimized `.htaccess` file is an ongoing process. Follow these steps to contribute or keep your local copy updated with the latest best practices:
 
-Make Local Changes:
+1. **Clone/Fork the Repository**:
 
-Open the .htaccess file (or README.md or any other file) in your preferred code editor.
+   * If you haven't already, fork this repository to your GitHub account or clone it locally:
+     `git clone https://github.com/zygimantasj/wordpress-htaccess-optimized.git`
 
-Implement your desired changes or sync with the latest updates from the main repository.
+2. **Make Local Changes**:
 
-Commit Your Changes:
+   * Open the `.htaccess` file (or `README.md` or any other file) in your preferred code editor.
 
-Use clear and concise commit messages following the Conventional Commits specification. This helps maintain a readable project history.
+   * Implement your desired changes or sync with the latest updates from the main repository.
 
-Example Commit Message for a new feature: feat: Add new feature
+3. **Commit Your Changes**:
 
-Example Commit Message for a bug fix: fix: Resolve issue with X
+   * Use clear and concise commit messages following the [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) specification. This helps maintain a readable project history.
 
-Example Commit Message for documentation update: docs: Improve installation guide
+   * **Example Commit Message for a new feature:** `feat: Add new feature`
 
-Add an extended description if the changes are complex.
+   * **Example Commit Message for a bug fix:** `fix: Resolve issue with X`
 
-Push to GitHub:
+   * **Example Commit Message for documentation update:** `docs: Improve installation guide`
 
-Push your committed changes to your forked repository or directly to the main branch if you have the necessary permissions.
+   * Add an extended description if the changes are complex.
 
-Create a Pull Request (Optional, for contributions):
+4. **Push to GitHub**:
 
-If you've forked the repository and want to propose your changes to the main project, create a Pull Request from your fork.
+   * Push your committed changes to your forked repository or directly to the main branch if you have the necessary permissions.
 
-Versioning and Releases:
+5. **Create a Pull Request (Optional, for contributions)**:
 
-For significant updates, consider creating a GitHub Release. This tags a specific point in history and allows users to easily download stable versions.
+   * If you've forked the repository and want to propose your changes to the main project, create a Pull Request from your fork.
 
-Go to your repository on GitHub, click on "Releases," then "Draft a new release."
+6. **Versioning and Releases**:
 
-Choose a new tag (e.g., v1.0.2), provide a release title, and summarize the key changes in the description.
+   * For significant updates, consider creating a GitHub Release. This tags a specific point in history and allows users to easily download stable versions.
 
-Continuous Testing:
+   * Go to your repository on GitHub, click on "Releases," then "Draft a new release."
 
-Always test any .htaccess changes on a staging environment before deploying to a live production site. Regularly use tools like securityheaders.com and Google PageSpeed Insights to validate changes.
+   * Choose a new tag (e.g., `v1.0.2`), provide a release title, and summarize the key changes in the description.
 
-📌 What's New in v1.0.1
-This version builds upon extensive research and best practices to offer a highly optimized .htaccess file. Key improvements and additions since a hypothetical v1.0.0 release include:
+7. **Continuous Testing**:
 
-Hotlink Protection Example Clarification: The example domain in the optional hotlink protection section (Section 8) has been updated from a .lt TLD to a more universally recognized .com TLD (yourdomain.com). This change aims to improve clarity and reduce potential confusion for a global audience.
+   * Always test any `.htaccess` changes on a staging environment before deploying to a live production site. Regularly use tools like [securityheaders.com](https://securityheaders.com) and [Google PageSpeed Insights](https://pagespeed.web.dev/) to validate changes.
 
-Refined Comments & Links: All comments have been reviewed for clarity, conciseness, and professionalism, with updated and verified links to authoritative documentation for every directive.
+## 📌 What's New in `v1.0.1`
 
-Comprehensive Blocking Rules: Expanded and refined blocking directives to address more common WordPress exploit attempts and scanner requests.
+This version builds upon extensive research and best practices to offer a highly optimized `.htaccess` file. Key improvements and additions since a hypothetical `v1.0.0` release include:
 
-AVIF Image Format Support: Included AVIF image format in caching and compression directives for modern image optimization.
+* **Hotlink Protection Example Clarification**: The example domain in the optional hotlink protection section (Section 8) has been updated from a `.lt` TLD to a more universally recognized `.com` TLD (`yourdomain.com`). This change aims to improve clarity and reduce potential confusion for a global audience.
 
-Granular Cache-Control: Enhanced Cache-Control directives for better resource management, including the immutable flag for long-lived static assets.
+* **Refined Comments & Links**: All comments have been reviewed for clarity, conciseness, and professionalism, with updated and verified links to authoritative documentation for every directive.
 
-📦 Versioning & Credits
-Current version: v1.0.1
+* **Comprehensive Blocking Rules**: Expanded and refined blocking directives to address more common WordPress exploit attempts and scanner requests.
 
-Optimized & Maintained by: @zygimantasj
+* **AVIF Image Format Support**: Included `AVIF` image format in caching and compression directives for modern image optimization.
 
-Based on original principles: Andreas Hecht's Gist (v2.0.9) and insights from his article: Die perfekte .htaccess für WordPress
+* **Granular Cache-Control**: Enhanced `Cache-Control` directives for better resource management, including the `immutable` flag for long-lived static assets.
 
-📚 Further Reading & Authoritative Resources
-Mozilla Developer Network (MDN) - HTTP Headers Reference: An indispensable resource for understanding HTTP headers and their usage.
+## 📦 Versioning & Credits
 
-Google PageSpeed Insights: A critical tool for analyzing and improving your website's performance on both mobile and desktop.
+**Current version**: `v1.0.1`
 
-securityheaders.com: A quick and effective online tool to check your site's implemented security headers and overall security posture.
+**Optimized & Maintained by**: [@zygimantasj](https://github.com/zygimantasj)
 
-Scott Helme - Referrer-Policy Guide: An in-depth article explaining the Referrer-Policy header and its implications.
+**Based on original principles**: Andreas Hecht's Gist (v2.0.9) and insights from his article: [Die perfekte .htaccess für WordPress](https://seoagentur-hamburg.com/blog/die-perfekte-htaccess-fuer-wordpress/)
 
-OWASP Cheat Sheet Series - .htaccess: While not exclusively for .htaccess, OWASP provides excellent web security guidelines that often involve server configurations.
+## 📚 Further Reading & Authoritative Resources
 
-Sucuri - Hardening WordPress Security: A comprehensive guide on securing WordPress installations against various threats.
+* [**Mozilla Developer Network (MDN) - HTTP Headers Reference**](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers): An indispensable resource for understanding HTTP headers and their usage.
 
-WPBeginner - How to Block Bad Bots in WordPress using .htaccess: A practical guide on implementing bot blocking rules within .htaccess for WordPress.
+* [**Google PageSpeed Insights**](https://pagespeed.web.dev/): A critical tool for analyzing and improving your website's performance on both mobile and desktop.
 
-⚠️ Disclaimer
-This configuration is provided "as-is" and is intended as a starting point for optimizing your WordPress .htaccess file. While it incorporates current best practices and security standards, server configurations and specific WordPress setups can vary. It is imperative to thoroughly test this .htaccess file on a staging or development environment before deploying it to a live production website. The author is not liable for any issues, data loss, or damages caused by the use or misuse of this configuration.
+* [**securityheaders.com**](https://securityheaders.com): A quick and effective online tool to check your site's implemented security headers and overall security posture.
+
+* [**Scott Helme - Referrer-Policy Guide**](https://scotthelme.co.uk/a-new-security-header-referrer-policy/): An in-depth article explaining the Referrer-Policy header and its implications.
+
+* [**OWASP Cheat Sheet Series - .htaccess**](https://cheatsheetseries.owasp.org/cheatsheets/Hardened_php.html): While not exclusively for .htaccess, OWASP provides excellent web security guidelines that often involve server configurations.
+
+* [**Sucuri - Hardening WordPress Security**](https://sucuri.net/guides/wordpress-security/): A comprehensive guide on securing WordPress installations against various threats.
+
+* [**WPBeginner - How to Block Bad Bots in WordPress using .htaccess**](https://www.wpbeginner.com/wp-tutorials/how-to-block-bad-bots-in-wordpress-using-htaccess/): A practical guide on implementing bot blocking rules within .htaccess for WordPress.
+
+## ⚠️ Disclaimer
+
+This configuration is provided "as-is" and is intended as a starting point for optimizing your WordPress `.htaccess` file. While it incorporates current best practices and security standards, server configurations and specific WordPress setups can vary. **It is imperative to thoroughly test this `.htaccess` file on a staging or development environment before deploying it to a live production website.** The author is not liable for any issues, data loss, or damages caused by the use or misuse of this configuration.
