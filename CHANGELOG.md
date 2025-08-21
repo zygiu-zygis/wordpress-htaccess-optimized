@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2025-08-21
+
+### Added
+- **SEO Discoverability**: Added SEO keywords to comments in `.htaccess` to improve search engine visibility.
+- **SEO Documentation**: Added a "Why This Matters for SEO" section to `README.md` to explain the connection between `.htaccess` rules and search rankings.
+
+### Changed
+- **Documentation**: Improved the structure and content of `README.md` with new SEO-focused headings and clearer explanations.
+- **Project Version**: Updated project version to `v1.0.3`.
+
+---
+
 ## [1.0.2] - 2025-08-21
 
 ### Added

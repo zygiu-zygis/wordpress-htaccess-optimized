@@ -1,7 +1,13 @@
+# <!--
+# This file provides a comprehensive WordPress .htaccess optimization for performance and security.
+# It includes WordPress htaccess SEO tweaks and rules based on WordPress .htaccess security best practices.
+# Use this file to fix .htaccess caching issues and harden your WordPress installation.
+# -->
+
 ########################################################################
 # THE ULTIMATE WORDPRESS .htaccess FOR SPEED, SECURITY & SEO
 # ----------------------------------------------------------------------
-# @Version: 1.0.2 - August 2025
+# @Version: 1.0.3 - August 2025
 # @Author: Optimized by ZygimantasJ (based on various authoritative sources,
 #          including Andreas Hecht from seoagentur-hamburg.com)
 # License: GNU General Public License v2 or later
@@ -116,6 +122,7 @@ Options -Indexes
 # | 4. Advanced Security: Malicious Request & Bot Blocking
 # ----------------------------------------------------------------------
 
+# These rules follow WordPress .htaccess security best practices to block common threats.
 # Block common exploit patterns and sensitive file access.
 # Note: review carefully; tighten/relax based on your stack.
 # Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
@@ -153,6 +160,7 @@ Options -Indexes
 # ----------------------------------------------------------------------
 # | 5. Browser Caching with mod_expires
 # |   Sets 'Expires' and influences 'Cache-Control: max-age'.
+# |   This is a key part of any effort to fix .htaccess caching on WordPress.
 # ----------------------------------------------------------------------
 
 # Docs: https://httpd.apache.org/docs/current/mod/mod_expires.html
