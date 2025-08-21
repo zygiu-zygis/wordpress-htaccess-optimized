@@ -1,7 +1,7 @@
 ########################################################################
 # THE ULTIMATE WORDPRESS .htaccess FOR SPEED, SECURITY & SEO
 # ----------------------------------------------------------------------
-# @Version: 1.0.1 - June 2025
+# @Version: 1.0.2 - August 2025
 # @Author: Optimized by ZygimantasJ (based on various authoritative sources,
 #          including Andreas Hecht from seoagentur-hamburg.com)
 # License: GNU General Public License v2 or later
@@ -20,6 +20,10 @@ ErrorDocument 403 /403.php
 # Hide Apache version and OS info in responses.
 # Docs: https://httpd.apache.org/docs/current/mod/core.html#serversignature
 ServerSignature Off
+
+# Disable directory browsing/listing.
+# Docs: https://httpd.apache.org/docs/current/mod/core.html#options
+Options -Indexes
 
 # Mitigate clickjacking by allowing frames only from same origin.
 # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
@@ -45,6 +49,12 @@ ServerSignature Off
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
+# Restrict Adobe Flash/PDF cross-domain data access.
+# Docs: https://owasp.org/www-project-secure-headers/#x-permitted-cross-domain-policies
+<IfModule mod_headers.c>
+    Header always set X-Permitted-Cross-Domain-Policies "none"
+</IfModule>
+
 # Enforce HTTPS for future visits (enable only on fully HTTPS sites).
 # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
 <IfModule mod_headers.c>
@@ -57,11 +67,25 @@ ServerSignature Off
     Header always set Content-Security-Policy "upgrade-insecure-requests"
 </IfModule>
 
-# Restrict powerful browser features (tight baseline).
+# Restrict powerful browser features (minimal, stable baseline).
 # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
 <IfModule mod_headers.c>
-    Header always set Permissions-Policy "geolocation=(), midi=(), sync-xhr=(), accelerometer=(), gyroscope=(), magnetometer=(), camera=(), fullscreen=(self), payment=(), usb=()"
+    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), accelerometer=(), gyroscope=(), magnetometer=(), payment=(), usb=(), fullscreen=(self)"
 </IfModule>
+
+# ----------------------------------------------------------------------
+# | 1.1. Optional: Advanced Cross-Origin Isolation
+# |   Uncomment these headers to enable a cross-origin isolated state.
+# |   WARNING: This is a major change and can break third-party embeds
+# |   (iframes, scripts, images). Test thoroughly before production.
+# |   Docs: https://web.dev/coop-coep/
+# ----------------------------------------------------------------------
+
+# <IfModule mod_headers.c>
+#     Header always set Cross-Origin-Opener-Policy "same-origin"
+#     Header always set Cross-Origin-Embedder-Policy "require-corp"
+#     Header always set Cross-Origin-Resource-Policy "same-site"
+# </IfModule>
 
 # ----------------------------------------------------------------------
 # | 2. HTTP to HTTPS Redirection (Conditional Use)
@@ -231,6 +255,31 @@ ServerSignature Off
         Header append Vary Accept-Encoding env=!dont-vary
     </IfModule>
 </IfModule>
+
+# ----------------------------------------------------------------------
+# | 6.1. Optional: Compression (Brotli)
+# |   If your server supports Brotli, uncomment this block for better
+# |   compression ratios than GZIP. mod_brotli must be enabled.
+# ----------------------------------------------------------------------
+
+# <IfModule mod_brotli.c>
+#     # Text, markup, and script types.
+#     AddOutputFilterByType BROTLI_COMPRESS text/plain
+#     AddOutputFilterByType BROTLI_COMPRESS text/html
+#     AddOutputFilterByType BROTLI_COMPRESS text/xml
+#     AddOutputFilterByType BROTLI_COMPRESS text/css
+#     AddOutputFilterByType BROTLI_COMPRESS text/vtt
+#     AddOutputFilterByType BROTLI_COMPRESS text/x-component
+#     AddOutputFilterByType BROTLI_COMPRESS application/xml
+#     AddOutputFilterByType BROTLI_COMPRESS application/xhtml+xml
+#     AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
+#     AddOutputFilterByType BROTLI_COMPRESS application/javascript
+#     AddOutputFilterByType BROTLI_COMPRESS application/atom+xml
+#     AddOutputFilterByType BROTLI_COMPRESS application/json
+#     AddOutputFilterByType BROTLI_COMPRESS application/ld+json
+#     AddOutputFilterByType BROTLI_COMPRESS application/vnd.api+json
+#     AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
+# </IfModule>
 
 # ----------------------------------------------------------------------
 # | 7. Cache-Control Header Directives (Granular Control)

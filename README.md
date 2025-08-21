@@ -1,6 +1,9 @@
 # WordPress .htaccess for Maximum Speed, Security & SEO
 
-A production-grade `.htaccess` for WordPress — optimized for **performance**, **security**, **Core Web Vitals**, and **SEO**. Version `v1.0.1` delivers modern caching, GZIP compression, security headers, proactive bot blocking, and optional hotlink protection.
+[![Release v1.0.2](https://img.shields.io/badge/release-v1.0.2-blue.svg)](CHANGELOG.md#102---2025-08-21)
+[![License: GPL v2](https://img.shields.io/badge/License-GPL%20v2-blue.svg)](LICENSE)
+
+A production-grade `.htaccess` for WordPress — optimized for **performance**, **security**, **Core Web Vitals**, and **SEO**. Version `v1.0.2` delivers modern caching, GZIP compression, security headers, proactive bot blocking, and optional hotlink protection.
 
 ---
 
@@ -51,13 +54,14 @@ A production-grade `.htaccess` for WordPress — optimized for **performance**, 
 
 ---
 
-## 📌 What’s New in `v1.0.1`
+## 📌 What’s New in `v1.0.2`
 
-- Removed deprecated/duplicate MIME types and **inline trailing comments** that can break Apache parsing.
-- Added explicit `Cache-Control` with **`immutable`** for versioned static assets.
-- Clarified JSON handling: revalidation by default; **example `no-store`** for API `.json` files.
-- Safer security section: **do not block** `.well-known/security.txt` by default; keep `xmlrpc.php` block with a caution note.
-- Improved comments for GitHub readability and maintainability.
+- **Security Hardening**: Added `Options -Indexes` and `X-Permitted-Cross-Domain-Policies`.
+- **Permissions-Policy**: Updated to a minimal, stable baseline.
+- **Optional Features**: Added commented-out blocks for Brotli compression and advanced cross-origin isolation (COOP/COEP/CORP).
+- **Documentation**: Added `CHANGELOG.md` and release badges.
+
+See the [**CHANGELOG.md**](CHANGELOG.md) for full details.
 
 ---
 
