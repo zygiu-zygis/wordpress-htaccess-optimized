@@ -12,94 +12,64 @@
 # | 1. Core Server Settings & Fundamental Security Headers
 # ----------------------------------------------------------------------
 
-# Custom Error Pages: Redirects specific HTTP error codes (e.g., 404 Not Found, 403 Forbidden)
-# to custom error pages. This improves user experience by providing branded error messages
-# and enhances security by preventing default server error pages that might reveal server info.
-# More: https://httpd.apache.org/docs/current/howto/custom-error.html
+# Custom Error Pages: Improve UX and avoid default server pages.
+# Docs: https://httpd.apache.org/docs/current/howto/custom-error.html
 ErrorDocument 404 /404.php
 ErrorDocument 403 /403.php
 
-# Server Signature Off: Prevents Apache from displaying its version number and operating system
-# information in server-generated pages (like error messages) and HTTP response headers.
-# This is a security best practice to avoid revealing server details to potential attackers.
-# More: https://httpd.apache.org/docs/current/mod/core.html#serversignature
+# Hide Apache version and OS info in responses.
+# Docs: https://httpd.apache.org/docs/current/mod/core.html#serversignature
 ServerSignature Off
 
-# X-Frame-Options: Protects against Clickjacking attacks.
-# "SAMEORIGIN" allows the page to be displayed in a frame only on the same origin (domain)
-# as the page itself, preventing malicious sites from embedding your content.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+# Mitigate clickjacking by allowing frames only from same origin.
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
 <IfModule mod_headers.c>
     Header always set X-Frame-Options "SAMEORIGIN"
 </IfModule>
 
-# X-XSS-Protection: Enables the Cross-Site Scripting (XSS) filter built into modern browsers.
-# "1; mode=block" means that if an XSS attack is detected, the browser will stop rendering
-# the page altogether instead of sanitizing the suspected malicious content.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
+# Legacy XSS protection header (kept for older browsers).
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
 <IfModule mod_headers.c>
     Header always set X-XSS-Protection "1; mode=block"
 </IfModule>
 
-# X-Content-Type-Options: Prevents MIME type sniffing.
-# "nosniff" forces browsers to strictly adhere to the 'Content-Type' header declared by the server.
-# This prevents browsers from trying to guess content types, which can lead to XSS vulnerabilities
-# if a server incorrectly serves user-uploaded content with an executable MIME type.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
+# Prevent MIME type sniffing.
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
 <IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
 </IfModule>
 
-# Referrer-Policy: Controls how much referrer information (the previous page's URL) is sent
-# with HTTP requests initiated from your page.
-# "strict-origin-when-cross-origin" sends the full URL for same-origin requests but only the origin
-# (domain) for cross-origin requests. This balances privacy with necessary analytics.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
-# For detailed examples and use cases: https://scotthelme.co.uk/a-new-security-header-referrer-policy/
+# Limit referer info; balance privacy and analytics.
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
 <IfModule mod_headers.c>
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Strict-Transport-Security (HSTS): Enforces HTTPS for all future connections from returning users.
-# "max-age" specifies how long (in seconds) browsers should remember to only access the site via HTTPS.
-# "includeSubDomains" applies the policy to all subdomains. "preload" allows inclusion in browser HSTS preload lists.
-# IMPORTANT: Ensure your site fully supports HTTPS across all pages and subdomains before enabling this.
-# Misconfiguration can make your site inaccessible.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
+# Enforce HTTPS for future visits (enable only on fully HTTPS sites).
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
 <IfModule mod_headers.c>
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
 </IfModule>
 
-# Content-Security-Policy (CSP): A fundamental security layer that helps detect and mitigate certain types of attacks,
-# including Cross Site Scripting (XSS) and data injection attacks.
-# "upgrade-insecure-requests" instructs user agents (browsers) to rewrite URL schemes,
-# automatically upgrading HTTP requests to HTTPS, thereby preventing mixed content issues.
-# NOTE: For complex sites with many external resources, a more detailed CSP might be needed, which can be complex
-# to configure without breaking functionality. This is a good baseline to mitigate common mixed content warnings.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
+# Baseline CSP to auto-upgrade insecure requests (prevents mixed content).
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 <IfModule mod_headers.c>
     Header always set Content-Security-Policy "upgrade-insecure-requests"
 </IfModule>
 
-# Permissions-Policy (formerly Feature-Policy): Controls browser features access for the document and its iframes.
-# This header allows you to selectively enable or disable various browser features (e.g., camera, microphone, geolocation)
-# for your page and any embedded content, enhancing security and privacy.
-# Listed features are disabled for all contexts (empty parentheses), except 'fullscreen' which is allowed for 'self' origin.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
+# Restrict powerful browser features (tight baseline).
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
 <IfModule mod_headers.c>
     Header always set Permissions-Policy "geolocation=(), midi=(), sync-xhr=(), accelerometer=(), gyroscope=(), magnetometer=(), camera=(), fullscreen=(self), payment=(), usb=()"
 </IfModule>
 
 # ----------------------------------------------------------------------
 # | 2. HTTP to HTTPS Redirection (Conditional Use)
-# |   (Activate ONLY if your hosting provider/CDN does not handle this automatically,
-# |   e.g., Cloudways typically manages SSL redirection via its platform settings)
+# |   Enable only if your platform/CDN does not already force HTTPS.
 # ----------------------------------------------------------------------
 
-# Uncomment the following block to force all HTTP traffic to HTTPS.
-# This uses a 301 (Permanent) redirect, which is good for SEO.
-# More: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
-# Example: https://www.digitalocean.com/community/tutorials/how-to-redirect-http-to-https-in-apache
+# 301 redirect HTTP -> HTTPS (uncomment only if needed).
+# Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
 # <IfModule mod_rewrite.c>
 # RewriteEngine On
 # RewriteCond %{HTTPS} off
@@ -108,113 +78,115 @@ ServerSignature Off
 
 # ----------------------------------------------------------------------
 # | 3. Cross-Origin Resource Sharing (CORS) Configuration
-# |   (Essential for loading assets like web fonts, CSS, or JS from different domains or CDNs)
 # ----------------------------------------------------------------------
 
-# This block sets the 'Access-Control-Allow-Origin' header to "*" for specific file types.
-# This means assets (e.g., fonts, images, scripts) matching these file types can be accessed
-# from any origin. This is crucial for content served from a CDN or different subdomain to avoid CORS errors.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
+# Allow cross-origin access for typical CDN-served assets (fonts, CSS, JS, images).
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
 <IfModule mod_headers.c>
-    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font\.css|css|js|mjs|gif|png|jpe?g|svg|svgz|ico|webp|avif)$">
+    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|css|js|mjs|gif|png|jpe?g|svg|svgz|ico|webp|avif)$">
         Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
 </IfModule>
 
 # ----------------------------------------------------------------------
 # | 4. Advanced Security: Malicious Request & Bot Blocking
-# |   (Proactively blocks common attacks, nuisance requests, and known scanners)
 # ----------------------------------------------------------------------
 
-# This section uses mod_rewrite to block requests that are commonly associated with
-# vulnerability scans, brute-force attempts, and access to sensitive files.
-# While not a complete firewall, it adds a significant layer of defense.
-# More: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
-# Practical examples for WordPress: https://www.wpbeginner.com/wp-tutorials/how-to-block-bad-bots-in-wordpress-using-htaccess/
-# General WordPress security hardening: https://sucuri.net/guides/wordpress-security/
+# Block common exploit patterns and sensitive file access.
+# Note: review carefully; tighten/relax based on your stack.
+# Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
-    # Block suspicious PHP file extensions often used in exploits to bypass security checks.
+
+    # Block suspicious extension used by some shells.
     RewriteRule \.php\.suspected - [F,NC,L]
-    # Block Apple app-site-association checks, frequently used by bots for reconnaissance.
+
+    # Block frequent reconnaissance endpoints.
     RewriteRule ^apple-app-site-association$ - [F,NC,L]
-    # Block Autodiscover XML requests, common for Outlook/Office scanners and potential exploits.
     RewriteRule ^autodiscover/autodiscover\.xml$ - [F,NC,L]
 
-    # Block access to common WordPress reconnaissance files/paths and exploit attempts.
-    # This prevents information disclosure and direct access to vulnerable scripts.
-    RewriteRule ^\.well-known/security\.txt$ - [F,NC,L] # Standard file for security disclosures.
-    RewriteRule ^readme\.html$ - [F,NC,L] # Blocks access to WordPress readme file, which reveals version info.
-    RewriteRule ^xmlrpc\.php$ - [F,NC,L] # Blocks XML-RPC API (often exploited for DDoS or brute-force). Use with caution if specific plugins rely on it.
-    RewriteRule ^wp-config\.bak$ - [F,NC,L] # Blocks access to backup copies of wp-config.php (contains database credentials).
-    RewriteRule ^wp-content/debug\.log$ - [F,NC,L] # Blocks access to debug logs, which may contain sensitive information.
-    RewriteRule ^wp-content/uploads/.*\.(php|phps|phtml)$ - [F,NC,L] # Prevents PHP execution in the uploads directory, mitigating malicious file uploads.
-    RewriteRule ^wp-includes/(.*\.php)$ - [F,NC,L] # Protects the wp-includes directory from direct PHP file access for core files.
+    # DO NOT block security.txt unless you intentionally do so.
+    # If you serve .well-known/security.txt, comment the next line out entirely.
+    # RewriteRule ^\.well-known/security\.txt$ - [F,NC,L]
+
+    # Prevent disclosure of WP version and direct core/script access.
+    RewriteRule ^readme\.html$ - [F,NC,L]
+
+    # Block XML-RPC (often abused). WARNING: some plugins/services (e.g., Jetpack) need it.
+    RewriteRule ^xmlrpc\.php$ - [F,NC,L]
+
+    # Block access to common sensitive backups/logs.
+    RewriteRule ^wp-config\.bak$ - [F,NC,L]
+    RewriteRule ^wp-content/debug\.log$ - [F,NC,L]
+
+    # Disallow PHP execution in uploads.
+    RewriteRule ^wp-content/uploads/.*\.(php|phps|phtml)$ - [F,NC,L]
+
+    # Disallow direct PHP execution in wp-includes.
+    RewriteRule ^wp-includes/(.*\.php)$ - [F,NC,L]
 </IfModule>
 
 # ----------------------------------------------------------------------
 # | 5. Browser Caching with mod_expires
-# |   (Sets expiration dates for static assets, significantly improving load times for repeat visitors)
+# |   Sets 'Expires' and influences 'Cache-Control: max-age'.
 # ----------------------------------------------------------------------
 
-# mod_expires allows the server to set an 'Expires' header in the HTTP response.
-# This header tells the browser how long it should cache a file before requesting it again from the server.
-# By caching static assets, repeat visits become much faster as the browser loads files from its local cache.
-# More: https://httpd.apache.org/docs/current/mod/mod_expires.html
+# Docs: https://httpd.apache.org/docs/current/mod/mod_expires.html
 <IfModule mod_expires.c>
-    ExpiresActive on
-    # Default cache duration for all files if not explicitly set below.
+    ExpiresActive On
+
+    # Safe default for uncategorized types.
     ExpiresDefault "access plus 1 month"
 
-    # Aggressive caching for static assets (CSS, JS, images, fonts).
-    # These files change infrequently and benefit most from long-term caching (1 year).
-    ExpiresByType text/css "access plus 1 year"
-    ExpiresByType application/javascript "access plus 1 year"
-    ExpiresByType application/x-javascript "access plus 1 year"
-    ExpiresByType text/javascript "access plus 1 year"
-    ExpiresByType image/bmp "access plus 1 year"
-    ExpiresByType image/gif "access plus 1 year"
-    ExpiresByType image/jpeg "access plus 1 year"
-    ExpiresByType image/png "access plus 1 year"
-    ExpiresByType image/svg+xml "access plus 1 year"
-    ExpiresByType image/webp "access plus 1 year"
-    ExpiresByType image/avif "access plus 1 year" # Added support for AVIF image format (modern, efficient)
-    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
-    ExpiresByType font/eot "access plus 1 year"
-    ExpiresByType font/opentype "access plus 1 year"
-    ExpiresByType application/x-font-ttf "access plus 1 year"
-    ExpiresByType application/font-woff "access plus 1 year"
-    ExpiresByType application/x-font-woff "access plus 1 year"
-    ExpiresByType font/woff "access plus 1 year"
-    ExpiresByType application/font-woff2 "access plus 1 year"
-    ExpiresByType audio/ogg "access plus 1 year"
-    ExpiresByType video/mp4 "access plus 1 year"
-    ExpiresByType video/ogg "access plus 1 year"
-    ExpiresByType video/webm "access plus 1 year"
+    # Long-lived, versioned static assets (hash or version in filename recommended).
+    ExpiresByType text/css                         "access plus 1 year"
+    ExpiresByType application/javascript           "access plus 1 year"
 
-    # Shorter caching for frequently updated or less critical assets.
-    ExpiresByType application/manifest+json "access plus 1 week"
-    ExpiresByType image/vnd.microsoft.icon "access plus 1 week"
-    ExpiresByType image/x-icon "access plus 1 week"
-    ExpiresByType text/x-cross-domain-policy "access plus 1 week"
+    # Images
+    ExpiresByType image/bmp                        "access plus 1 year"
+    ExpiresByType image/gif                        "access plus 1 year"
+    ExpiresByType image/jpeg                       "access plus 1 year"
+    ExpiresByType image/png                        "access plus 1 year"
+    ExpiresByType image/svg+xml                    "access plus 1 year"
+    ExpiresByType image/webp                       "access plus 1 year"
+    ExpiresByType image/avif                       "access plus 1 year"
 
-    # No caching or very short caching for dynamic content and API responses.
-    # This ensures fresh content is always served and prevents stale data issues.
-    ExpiresByType application/atom+xml "access plus 1 hour"
-    ExpiresByType application/rdf+xml "access plus 1 hour"
-    ExpiresByType application/rss+xml "access plus 1 hour"
-    ExpiresByType application/json "access plus 0 seconds"
-    ExpiresByType application/ld+json "access plus 0 seconds"
-    ExpiresByType application/schema+json "access plus 0 seconds"
-    ExpiresByType application/vnd.geo+json "access plus 0 seconds"
-    ExpiresByType application/xml "access plus 0 seconds"
-    ExpiresByType text/xml "access plus 0 seconds"
-    ExpiresByType text/html "access plus 0 seconds" # HTML is generally not cached long by browsers
+    # Fonts (modern MIME types)
+    ExpiresByType font/ttf                         "access plus 1 year"
+    ExpiresByType font/woff                        "access plus 1 year"
+    ExpiresByType font/woff2                       "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject    "access plus 1 year"
 
-    # Disable ETag: The 'ETag' header is an identifier for a specific version of a resource.
-    # Disabling it can prevent potential caching conflicts with CDNs and reverse proxies,
-    # as caching will then rely solely on 'Expires' and 'Cache-Control' headers.
-    # More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
+    # Media
+    ExpiresByType audio/ogg                        "access plus 1 year"
+    ExpiresByType video/mp4                        "access plus 1 year"
+    ExpiresByType video/ogg                        "access plus 1 year"
+    ExpiresByType video/webm                       "access plus 1 year"
+
+    # Shorter-lived items (manifests, icons, policies).
+    ExpiresByType application/manifest+json        "access plus 1 week"
+    ExpiresByType image/vnd.microsoft.icon         "access plus 1 week"
+    ExpiresByType image/x-icon                     "access plus 1 week"
+    ExpiresByType text/x-cross-domain-policy       "access plus 1 week"
+
+    # Dynamic feeds: keep relatively fresh.
+    ExpiresByType application/atom+xml             "access plus 1 hour"
+    ExpiresByType application/rdf+xml              "access plus 1 hour"
+    ExpiresByType application/rss+xml              "access plus 1 hour"
+
+    # API-type JSON: zero freshness lifetime here; see Section 7 for no-store.
+    ExpiresByType application/json                 "access plus 0 seconds"
+    ExpiresByType application/ld+json              "access plus 0 seconds"
+    ExpiresByType application/schema+json          "access plus 0 seconds"
+    ExpiresByType application/vnd.geo+json         "access plus 0 seconds"
+
+    # XML/HTML: force revalidation (also see Section 7).
+    ExpiresByType application/xml                  "access plus 0 seconds"
+    ExpiresByType text/xml                         "access plus 0 seconds"
+    ExpiresByType text/html                        "access plus 0 seconds"
+
+    # ETag policy: Disable to avoid cache conflicts in multi-node/CDN scenarios.
+    # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
     <IfModule mod_headers.c>
         Header unset ETag
     </IfModule>
@@ -223,15 +195,12 @@ ServerSignature Off
 
 # ----------------------------------------------------------------------
 # | 6. Compression (GZIP / Deflate)
-# |   (Reduces file size before sending to the browser, significantly speeding up downloads)
+# |   Compress text-based content to reduce transfer size.
 # ----------------------------------------------------------------------
 
-# mod_deflate allows the server to compress content before sending it to the client.
-# This reduces bandwidth usage and drastically improves page load times for compressible file types.
-# More: https://httpd.apache.org/docs/current/mod/mod_deflate.html
+# Docs: https://httpd.apache.org/docs/current/mod/mod_deflate.html
 <IfModule mod_deflate.c>
-    # AddOutputFilterByType DEFLATE applies GZIP compression to the specified MIME types.
-    # This includes common text-based content like HTML, CSS, JavaScript, and XML.
+    # Text, markup, and script types.
     AddOutputFilterByType DEFLATE text/plain
     AddOutputFilterByType DEFLATE text/html
     AddOutputFilterByType DEFLATE text/xml
@@ -241,113 +210,93 @@ ServerSignature Off
     AddOutputFilterByType DEFLATE application/xml
     AddOutputFilterByType DEFLATE application/xhtml+xml
     AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/js
     AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/x-javascript
-    AddOutputFilterByType DEFLATE application/x-httpd-php
-    AddOutputFilterByType DEFLATE application/x-httpd-fastphp
     AddOutputFilterByType DEFLATE application/atom+xml
     AddOutputFilterByType DEFLATE application/json
     AddOutputFilterByType DEFLATE application/ld+json
-    AddOutputFilterByType DEFLATE application/schema+json # Added for schema.org JSON-LD
-    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
-    AddOutputFilterByType DEFLATE application/x-font-ttf
-    AddOutputFilterByType DEFLATE application/font-woff2
-    AddOutputFilterByType DEFLATE application/x-font-woff
-    AddOutputFilterByType DEFLATE font/woff
-    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE application/vnd.api+json
     AddOutputFilterByType DEFLATE image/svg+xml
-    AddOutputFilterByType DEFLATE application/vnd.api+json # Added for JSON API responses
 
-    # SetEnvIfNoCase REQUEST_URI \.(?:...) no-gzip dont-vary:
-    # This directive prevents re-compression of files that are already compressed (e.g., images, videos, archives).
-    # Re-compressing these files would be inefficient and could potentially lead to corruption.
-    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|avif|mp4|webm|ogg|zip|rar|gz|tgz|bz2|pdf|xlsx|docx)$ no-gzip dont-vary
+    # Avoid recompressing already-compressed assets (images, video, archives, docs).
+    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|avif|mp4|webm|ogg|zip|rar|gz|tgz|bz2|pdf|xlsx?|docx?)$ no-gzip dont-vary
 
-    # Browser-specific rules: These rules handle older browser quirks related to compression.
-    # For example, some older Mozilla/IE versions might have issues with compressed content.
+    # Old browser quirks.
     BrowserMatch ^Mozilla/4 gzip-only-text/html
     BrowserMatch ^Mozilla/4\.0[678] no-gzip
-    BrowserMatch \bMSI[E] !no-gzip !gzip-only-text/html
+    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
 
-    # Header append Vary Accept-Encoding:
-    # This header informs proxies and CDNs that the response content varies depending on the 'Accept-Encoding' header
-    # sent by the client. This helps prevent serving cached uncompressed content to clients that support compression,
-    # ensuring the most optimized version is always delivered.
-    # More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary
+    # Inform proxies that response varies by Accept-Encoding.
+    # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary
     <IfModule mod_headers.c>
         Header append Vary Accept-Encoding env=!dont-vary
     </IfModule>
 </IfModule>
 
 # ----------------------------------------------------------------------
-# | 7. Cache-Control Header Directives (Granular Caching Control)
-# |   (Provides more precise caching instructions to browsers and proxies)
+# | 7. Cache-Control Header Directives (Granular Control)
 # ----------------------------------------------------------------------
 
-# The 'Cache-Control' header offers more flexible and powerful caching directives than 'Expires'.
-# It dictates how, and for how long, the client and intermediate caches should store a response.
-# More: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
+# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
 <IfModule mod_headers.c>
-    # For highly static assets (e.g., images, fonts, minified CSS/JS) that will not change
-    # unless their URL (e.g., filename with version hash) changes.
-    # "max-age=31536000" sets a 1-year cache duration. "public" allows caching by any cache (client, proxy).
-    # "immutable" indicates that the resource will not be updated during its freshness lifetime,
-    # making it a strong signal for aggressive caching.
-    # More about 'immutable': https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control#immutable
-    <FilesMatch "\.(ico|pdf|flv|swf|js|mjs|css|gif|png|jpg|jpeg|webp|avif|txt|woff2|woff|ttf|eot|svg)$">
+    # Long-lived static assets (use hashed/versioned filenames).
+    # public + immutable prevents unnecessary revalidations during freshness lifetime.
+    <FilesMatch "\.(ico|pdf|flv|swf|js|mjs|css|gif|png|jpe?g|webp|avif|txt|woff2?|ttf|eot|svg)$">
         Header set Cache-Control "max-age=31536000, public, immutable"
     </FilesMatch>
-    # For dynamic content (HTML, PHP, XML, JSON) that needs to be fresh on each visit.
-    # "max-age=0" means the content is not to be cached. "must-revalidate" forces the browser
-    # to re-check with the server for a fresh copy on every request, ensuring content is always up-to-date.
-    <FilesMatch "\.(html|htm|php|xml|json)$">
+
+    # Web manifests and icons: shorter cache window.
+    <FilesMatch "\.(webmanifest|manifest|ico)$">
+        Header set Cache-Control "public, max-age=604800"
+    </FilesMatch>
+
+    # Generic JSON and HTML/XML: require revalidation by default.
+    # Note: WP REST API routes (e.g., /wp-json/...) are handled by PHP and not matched here.
+    <FilesMatch "\.(html?|xml|json)$">
         Header set Cache-Control "max-age=0, must-revalidate"
+    </FilesMatch>
+
+    # Example pattern for API JSON files (if you serve real .json files for API).
+    # Adjust pattern to your naming convention (e.g., *.api.json).
+    <FilesMatch "\.api\.json$">
+        Header set Cache-Control "no-store"
+        Header unset ETag
+    </FilesMatch>
+
+    # Optional CORS for fonts when served from another origin (CDN, subdomain).
+    <FilesMatch "\.(ttf|woff2?|eot)$">
+        Header set Access-Control-Allow-Origin "*"
     </FilesMatch>
 </IfModule>
 
 # ----------------------------------------------------------------------
 # | 8. Hotlink Protection (Optional)
-# |   (Prevents other websites from directly embedding your images, saving your bandwidth and server resources)
-# |   IMPORTANT: Uncomment this block and REPLACE 'yourdomain\.com' with your actual domain name.
 # ----------------------------------------------------------------------
 
-# Hotlinking is when another site uses your image directly on their page by linking to your server.
-# This consumes your bandwidth. This block uses mod_rewrite to block such requests.
-# More: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
-# Example: https://www.digitalocean.com/community/tutorials/how-to-protect-your-images-from-hotlinking-with-apache
+# Prevent other sites from embedding your images (replace yourdomain\.com).
+# Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
 # <IfModule mod_rewrite.c>
-# RewriteEngine on
-# RewriteCond %{HTTP_REFERER} !^$ [NC] # Allow direct access (e.g., if user types URL directly)
-# RewriteCond %{REQUEST_FILENAME} -f [NC] # Ensure the request is for an existing file
-# RewriteCond %{REQUEST_FILENAME} \.(gif|jpe?g|png|webp|avif)$ [NC] # Target specific image types
-# RewriteCond %{HTTP_REFERER} !^https?://([^.]+\.)?yourdomain\.com [NC] # Block if the referrer is NOT your domain
-# RewriteRule \.(gif|jpe?g|png|webp|avif)$ - [F,NC,L] # Forbid access (respond with 403 Forbidden)
+# RewriteEngine On
+# RewriteCond %{HTTP_REFERER} !^$ [NC]
+# RewriteCond %{REQUEST_FILENAME} -f [NC]
+# RewriteCond %{REQUEST_FILENAME} \.(gif|jpe?g|png|webp|avif)$ [NC]
+# RewriteCond %{HTTP_REFERER} !^https?://([^.]+\.)?yourdomain\.com [NC]
+# RewriteRule \.(gif|jpe?g|png|webp|avif)$ - [F,NC,L]
 # </IfModule>
 
 # ----------------------------------------------------------------------
 # | 9. WordPress Rewrite Rules (Standard)
-# |   (Essential for WordPress permalinks and routing to function correctly)
 # ----------------------------------------------------------------------
 
-# This is the standard block of rewrite rules generated by WordPress.
-# It ensures that "pretty permalinks" (e.g., yourdomain.com/my-post-title) work correctly
-# by directing all non-file/non-directory requests to the WordPress index.php file.
-# Do not modify this section unless you have a deep understanding of WordPress rewrite API.
-# More: https://wordpress.org/support/article/htaccess/
+# Standard pretty permalinks; do not edit unless you know what you are doing.
+# Docs: https://wordpress.org/support/article/htaccess/
 <IfModule mod_rewrite.c>
 RewriteEngine On
-# Pass Authorization header to PHP, crucial for certain APIs and plugins.
+# Preserve Authorization header for APIs/plugins that need it.
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-# Sets the base URL for rewrite rules. Usually just '/'.
 RewriteBase /
-# If the request is for index.php, stop processing rewrite rules (no redirect).
 RewriteRule ^index\.php$ - [L]
-# If the requested file does not exist,
 RewriteCond %{REQUEST_FILENAME} !-f
-# And if the requested directory does not exist,
 RewriteCond %{REQUEST_FILENAME} !-d
-# Then rewrite the request to index.php (L for Last, processing stops here).
 RewriteRule . /index.php [L]
 </IfModule>
 
