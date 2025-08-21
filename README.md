@@ -58,12 +58,7 @@ Proper **WordPress .htaccess optimization** is a powerful way to enhance your si
 
 ---
 
-## 📌 What’s New in `v1.0.2`
-
-- **Security Hardening**: Added `Options -Indexes` and `X-Permitted-Cross-Domain-Policies`.
-- **Permissions-Policy**: Updated to a minimal, stable baseline.
-- **Optional Features**: Added commented-out blocks for Brotli compression and advanced cross-origin isolation (COOP/COEP/CORP).
-- **Documentation**: Added `CHANGELOG.md` and release badges.
+## 📌 What’s New
 
 See the [**CHANGELOG.md**](CHANGELOG.md) for full details.
 
