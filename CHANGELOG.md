@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation**: Improved the structure and content of `README.md` with new SEO-focused headings and clearer explanations.
 - **Project Version**: Updated project version to `v1.0.3`.
 
+---
+
 ## [1.0.2] - 2025-08-21
 
 ### Added
