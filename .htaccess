@@ -75,7 +75,7 @@ Options -Indexes
 # Restrict powerful browser features (minimal, stable baseline).
 # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
 <IfModule mod_headers.c>
-    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), accelerometer=(), gyroscope=(), magnetometer=(), payment=(), usb=()"
+    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), accelerometer=(), gyroscope=(), magnetometer=(), payment=(), usb=(), fullscreen=*"
 </IfModule>
 
 # ----------------------------------------------------------------------
