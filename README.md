@@ -8,7 +8,7 @@ Designed to fix **WordPress slow TTFB**, resolve **missing security headers**, a
 - **Slow Site Speed**: Enables Brotli/GZIP compression and aggressive Browser Caching (1 Year) for instant asset loading.
 - **Security Warnings**: Adds HSTS, X-Frame-Options, and blocks `xmlrpc.php` brute force attacks.
 - **WooCommerce Issues**: 100% compatible with WooCommerce cart/checkout (prevents cache conflicts).
-- **SEO Penalties**: Fixes canonical URL issues (Forces HTTPS & Non-WWW) and improves Core Web Vitals.
+- **SEO Penalties**: Configurable to fix canonical URL issues (Forces HTTPS & Non-WWW) and improves Core Web Vitals.
 
 ## 📦 Features
 
@@ -32,11 +32,17 @@ Designed to fix **WordPress slow TTFB**, resolve **missing security headers**, a
 
 ## ⚙️ Configuration
 
+### ⚠️ Important: Redirects Disabled by Default
+To prevent "Redirect Loop" errors on initial setup, **HTTPS and WWW redirects are commented out**. You must manually enable them.
+
+1. Open the `.htaccess` file.
+2. Locate **Section 2: REDIRECTION**.
+3. **Remove the `#`** from the lines under "Force HTTPS" (only if SSL is active).
+4. **Remove the `#`** from the lines under "Force NON-WWW".
+
 ### WWW vs. Non-WWW
-By default, this file forces **non-www** (e.g., `example.com`).
-To force `www` (e.g., `www.example.com`), modify **Section 2**:
-1. Comment out the "Force NON-WWW" block.
-2. Uncomment the "Force WWW" block (if added) or write the rewrite rule manually.
+The file includes a pre-written block for **Non-WWW** (e.g., `example.com`).
+To force `www` instead (e.g., `www.example.com`), simply write a standard WWW rewrite rule in Section 2 instead of uncommenting the Non-WWW block.
 
 ### XML-RPC
 Blocked by default to prevent attacks. If you use the **WordPress Mobile App** or **Jetpack**, find the `xmlrpc.php` block in **Section 1** and comment it out.

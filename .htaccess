@@ -37,14 +37,18 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # NOTE: If using Cloudflare, set SSL/TLS to "Full" or "Strict" to avoid redirect loops.
-    # Force HTTPS
-    RewriteCond %{HTTPS} off
-    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+    # === OPTIONAL: REDIRECTS (REMOVE '#' TO ENABLE) ===
 
-    # Force NON-WWW (Default)
-    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
-    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
+    # NOTE: If using Cloudflare, set SSL/TLS to "Full" or "Strict" to avoid redirect loops.
+
+    # ONLY enable this if you have a valid SSL certificate installed.
+    # Force HTTPS
+    # RewriteCond %{HTTPS} off
+    # RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
+
+    # Force NON-WWW
+    # RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    # RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 </IfModule>
 
 # === 3. PERFORMANCE (COMPRESSION) ===
