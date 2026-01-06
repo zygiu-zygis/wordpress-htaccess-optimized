@@ -13,6 +13,7 @@ Designed to fix **WordPress slow TTFB**, resolve **missing security headers**, a
 ## 📦 Features
 
 - **Universal Compatibility**: Works on **Shared Hosting**, **VPS**, and **Cloud** environments. Auto-detects server capabilities (Apache vs. LiteSpeed) without 500 errors.
+- **Cloudflare Ready**: Fully compatible with Cloudflare CDN, Edge Cache friendly, and pre-configured to fix "ERR_TOO_MANY_REDIRECTS" loops (SSL/TLS handshake optimization).
 - **Modern Performance**:
   - **Brotli Compression**: Prioritizes `mod_brotli` for smaller file sizes, falls back to GZIP.
   - **Smart Caching**: Uses `Cache-Control: public` for that "instant load" feeling on modern browsers.
@@ -39,6 +40,11 @@ To force `www` (e.g., `www.example.com`), modify **Section 2**:
 
 ### XML-RPC
 Blocked by default to prevent attacks. If you use the **WordPress Mobile App** or **Jetpack**, find the `xmlrpc.php` block in **Section 1** and comment it out.
+
+## ☁️ Cloudflare & CDN
+
+> [!WARNING]
+> **Cloudflare Users:** You MUST set your SSL/TLS mode to **"Full"** or **"Full (Strict)"** in Cloudflare settings. Using "Flexible" mode will result in a generic "Redirect Loop" error because this .htaccess forces HTTPS server-side.
 
 ---
 

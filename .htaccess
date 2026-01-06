@@ -37,6 +37,7 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
+    # NOTE: If using Cloudflare, set SSL/TLS to "Full" or "Strict" to avoid redirect loops.
     # Force HTTPS
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
