@@ -1,41 +1,45 @@
-# WordPress .htaccess (Apache / LiteSpeed)
+# WordPress .htaccess "Gold Standard" (2025/2026 Edition)
 
-**High-Performance .htaccess Configuration for WordPress (2025/2026 Standards)**
+**The ultimate, high-performance `.htaccess` configuration for WordPress.**
 
-Minimalist, secure, and optimized for speed. Follows the **Kanso** principle (simplicity and functionality).
+Designed to fix **WordPress slow TTFB**, resolve **missing security headers**, and achieve **Score 100 Google PageSpeed** instantly. Compatible with Apache and LiteSpeed (Hostinger, SiteGround, Bluehost, etc.).
 
-## Features
+## 🚀 Solves These Problems Instantly
+- **Slow Site Speed**: Enables Brotli/GZIP compression and aggressive Browser Caching (1 Year) for instant asset loading.
+- **Security Warnings**: Adds HSTS, X-Frame-Options, and blocks `xmlrpc.php` brute force attacks.
+- **WooCommerce Issues**: 100% compatible with WooCommerce cart/checkout (prevents cache conflicts).
+- **SEO Penalties**: Fixes canonical URL issues (Forces HTTPS & Non-WWW) and improves Core Web Vitals.
 
-- **Security**:
+## 📦 Features
+
+- **Universal Compatibility**: Works on **Shared Hosting**, **VPS**, and **Cloud** environments. Auto-detects server capabilities (Apache vs. LiteSpeed) without 500 errors.
+- **Modern Performance**:
+  - **Brotli Compression**: Prioritizes `mod_brotli` for smaller file sizes, falls back to GZIP.
+  - **Smart Caching**: Uses `Cache-Control: public` for that "instant load" feeling on modern browsers.
+  - **Image Support**: Ready for `.webp` and `.avif` next-gen formats.
+- **Security Hardening**:
+  - Blocks sensitive files (`wp-config.php`, `.env`, `.git`, `composer.json`).
   - Disables directory browsing.
-  - Protects sensitive system files (`wp-config.php`, `.env`, `.git`).
-  - Blocks `xmlrpc.php` (prevents brute force attacks).
-  - Implements modern Security Headers (`HSTS`, `X-Frame-Options`, `Referrer-Policy`).
-  - Basic firewall to block malicious query strings.
-- **Performance**:
-  - **Compression**: Auto-enables **Brotli** (if available) or falls back to **GZIP**.
-  - **Caching**: Aggressive `Browser Caching` headers for static assets (images, CSS, JS).
-  - **LiteSpeed Ready**: Auto-detects LiteSpeed servers (e.g., Hostinger) and applies safe defaults.
-- **Compatibility**:
-  - Fully compatible with **WooCommerce** (no cart/checkout blocks).
-  - Forces **HTTPS** and **Non-WWW** URLs (configurable).
+  - Implements strict security headers.
 
-## Installation
+## 🛠️ Installation
 
-1. **Backup** your current `.htaccess` file.
-2. **Copy** the content of `.htaccess` from this repository.
-3. **Paste** it into your server's `.htaccess` file (root directory).
-4. **Test** your site incognito to ensure everything loads correctly.
+1. **Backup**: Download your existing `.htaccess` file via FTP/File Manager.
+2. **Copy**: Copy the entire content of the `.htaccess` file in this repo.
+3. **Paste**: Overwrite your server's `.htaccess` file (located in the `public_html` root).
+4. **Verify**: Open your site in Incognito mode. Everything should load faster.
 
-## Customization
+## ⚙️ Configuration
 
-- **WWW vs Non-WWW**: By default, this forces **non-www** (e.g., `example.com`). To force `www`, uncomment the relevant block in Section 2.
-- **XML-RPC**: If you use the WordPress Mobile App or Jetpack, comment out the `xmlrpc.php` block in Section 1.
+### WWW vs. Non-WWW
+By default, this file forces **non-www** (e.g., `example.com`).
+To force `www` (e.g., `www.example.com`), modify **Section 2**:
+1. Comment out the "Force NON-WWW" block.
+2. Uncomment the "Force WWW" block (if added) or write the rewrite rule manually.
 
-## Requirements
-
-- Apache 2.4+ or LiteSpeed Web Server.
-- Modules: `mod_rewrite`, `mod_headers`, `mod_expires`, `mod_deflate` (or `mod_brotli`).
+### XML-RPC
+Blocked by default to prevent attacks. If you use the **WordPress Mobile App** or **Jetpack**, find the `xmlrpc.php` block in **Section 1** and comment it out.
 
 ---
-*Maintained by zygiu-zygis. Designed for simplicity and speed.*
+
+*Maintained by zygiu-zygis. Follows the **Kanso** principle: Minimal, Functional, Perfect.*

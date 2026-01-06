@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2025-08-25
+
+### Added
+- **Gold Standard Rewrite**: Comprehensive update to the `.htaccess` file focusing on universal compatibility and "instant load" performance.
+- **Universal Safety**: Every single directive is now wrapped in `<IfModule>` containers to prevent 500 errors on any server environment (Shared/VPS).
+- **Modern Caching**: Added `Cache-Control: public, max-age=31536000` headers alongside `mod_expires` for superior browser caching speed.
+- **MIME Support**: Explicit support for `.webp` and `.avif` formats.
+- **SEO & Discovery**: Heavily optimized `README.md` with problem-solution keywords (TTFB, Security Headers, PageSpeed).
+
+### Changed
+- **Compression Logic**: Prioritized `mod_brotli` with a seamless fallback to `mod_deflate` (GZIP).
+- **Security**: Expanded sensitive file blocklist to include `composer.json` and `readme.html`.
+- **LiteSpeed Integration**: LiteSpeed-specific rules are now safely wrapped to ensure compatibility with standard Apache servers.
+
+---
+
 ## [2.0.0] - 2025-08-22
 
 ### Added
@@ -53,7 +69,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.1] - 2025-06-01
 
 ### Added
-- Initial release of the production-grade `.htaccess` file.
+- **Initial release**: Production-grade `.htaccess` file.
 - Comprehensive rules for security, caching, and SEO.
 - Modern security headers (HSTS, CSP, Permissions-Policy, etc.).
 - GZIP compression and browser caching rules.

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------
-# WORDPRESS .HTACCESS OPTIMIZED (v2.0.0)
+# WORDPRESS .HTACCESS GOLD STANDARD (v2.1.0)
 # ----------------------------------------------------------------------
 # Purpose: Security, Performance, Compatibility (Apache/LiteSpeed)
 # Author: zygiu-zygis
@@ -9,21 +9,20 @@
 # === 1. SECURITY & SERVER PROTECTION ===
 
 # Disable directory browsing
-Options -Indexes
+<IfModule mod_autoindex.c>
+    Options -Indexes
+</IfModule>
 
-# Protect sensitive files (includes Hostinger/LiteSpeed .user.ini)
-<FilesMatch "^(wp-config\.php|php\.ini|php5\.ini|install\.php|\.htaccess|\.env|\.user\.ini|\.git|readme\.html|license\.txt)$">
+# Protect sensitive files
+<FilesMatch "^(wp-config\.php|\.env|\.git|xmlrpc\.php|composer\.json|readme\.html|\.htaccess|\.user\.ini)$">
     <IfModule mod_authz_core.c>
         Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order deny,allow
+        Deny from all
     </IfModule>
 </FilesMatch>
-
-# Block XML-RPC (Comment out if using Jetpack or WP Mobile App)
-<Files xmlrpc.php>
-    <IfModule mod_authz_core.c>
-        Require all denied
-    </IfModule>
-</Files>
 
 # Security Headers
 <IfModule mod_headers.c>
@@ -31,15 +30,6 @@ Options -Indexes
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set X-Content-Type-Options "nosniff"
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
-    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
-</IfModule>
-
-# Block malicious query strings (Basic Firewall)
-# Ensures WooCommerce compatibility (avoids blocking common params)
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{QUERY_STRING} (eval\(|base64_|127\.0\.0\.1|union.*select|insert.*into|update.*set) [NC]
-    RewriteRule .* - [F]
 </IfModule>
 
 # === 2. REDIRECTION (SSL & WWW HANDLING) ===
@@ -54,62 +44,81 @@ Options -Indexes
     # Force NON-WWW (Default)
     RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
     RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
-
-    # Force WWW (Optional - Comment out NON-WWW block above and uncomment this)
-    # RewriteCond %{HTTP_HOST} !^www\. [NC]
-    # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 </IfModule>
 
 # === 3. PERFORMANCE (COMPRESSION) ===
 
-# Brotli Compression (Auto-Detected)
+# Brotli Compression (Priority)
 <IfModule mod_brotli.c>
-    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf font/woff font/woff2 application/vnd.ms-fontobject
 </IfModule>
 
 # GZIP Compression (Fallback)
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml
+    # Only enable GZIP if Brotli is not active or not supported for that type (though Apache usually handles the chain)
+    # Ideally, mod_brotli takes precedence if both are present.
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml image/x-icon font/ttf font/otf font/woff font/woff2 application/vnd.ms-fontobject
 </IfModule>
 
-# === 4. PERFORMANCE (CACHING) ===
+# === 4. PERFORMANCE (CACHING & MIME) ===
+
+# MIME Types for Modern Images
+<IfModule mod_mime.c>
+    AddType image/webp .webp
+    AddType image/avif .avif
+</IfModule>
 
 # Browser Caching (Expires)
 <IfModule mod_expires.c>
     ExpiresActive On
     ExpiresDefault "access plus 1 month"
 
-    # Text / HTML / JSON - Do not cache deeply to ensure fresh content
+    # HTML / JSON / XML - No Cache for dynamic freshness
     ExpiresByType text/html "access plus 0 seconds"
     ExpiresByType application/json "access plus 0 seconds"
     ExpiresByType text/xml "access plus 0 seconds"
 
-    # CSS / JS
+    # CSS / JS - 1 Year
     ExpiresByType text/css "access plus 1 year"
     ExpiresByType text/javascript "access plus 1 year"
     ExpiresByType application/javascript "access plus 1 year"
 
-    # Media / Images
+    # Media / Images - 1 Year
     ExpiresByType image/jpg "access plus 1 year"
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/png "access plus 1 year"
     ExpiresByType image/gif "access plus 1 year"
     ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/avif "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType image/x-icon "access plus 1 year"
     ExpiresByType video/mp4 "access plus 1 year"
     ExpiresByType video/webm "access plus 1 year"
 
-    # Fonts
+    # Fonts - 1 Year
     ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/otf "access plus 1 year"
     ExpiresByType font/woff "access plus 1 year"
     ExpiresByType font/woff2 "access plus 1 year"
+    ExpiresByType application/vnd.ms-fontobject "access plus 1 year"
 </IfModule>
 
-# LiteSpeed Specific Optimizations (Hostinger & others)
-# These rules are auto-detected and only apply on LiteSpeed servers
+# Cache-Control Headers (Modern Browsers)
+<IfModule mod_headers.c>
+    # Static Assets: Public, 1 Year (31536000s), Immutable (optional but good for speed)
+    <FilesMatch "\.(css|js|jpg|jpeg|png|gif|webp|avif|svg|ico|ttf|otf|woff|woff2)$">
+        Header set Cache-Control "public, max-age=31536000"
+    </FilesMatch>
+
+    # Dynamic Pages: No Cache (Ensure WooCommerce/Admin freshness)
+    <FilesMatch "\.(php|html)$">
+        Header set Cache-Control "no-cache, no-store, must-revalidate"
+    </FilesMatch>
+</IfModule>
+
+# LiteSpeed Specific Optimizations
 <IfModule LiteSpeed>
-    # LiteSpeed respects standard Apache rules above.
-    # We explicitly enable public cache lookup here for safety.
+    # Safe default for LiteSpeed
     CacheLookup on
 </IfModule>
 
