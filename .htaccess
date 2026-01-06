@@ -1,353 +1,123 @@
-# <!--
-# This file provides a comprehensive WordPress .htaccess optimization for performance and security.
-# It includes WordPress htaccess SEO tweaks and rules based on WordPress .htaccess security best practices.
-# Use this file to fix .htaccess caching issues and harden your WordPress installation.
-# -->
-
-########################################################################
-# THE ULTIMATE WORDPRESS .htaccess FOR SPEED, SECURITY & SEO
 # ----------------------------------------------------------------------
-# @Version: 1.0.3 - August 2025
-# @Author: Optimized by zygiu-zygis (with the help of Jules)
-# License: GNU General Public License v2 or later
-# License URI: http://www.gnu.org/licenses/gpl-2.0.html
-########################################################################
-
+# WORDPRESS .HTACCESS OPTIMIZED (v2.0.0)
 # ----------------------------------------------------------------------
-# | 1. Core Server Settings & Fundamental Security Headers
+# Purpose: Security, Performance, Compatibility (Apache/LiteSpeed)
+# Author: zygiu-zygis
+# Updated: 2025
 # ----------------------------------------------------------------------
 
-# Custom Error Pages: Improve UX and avoid default server pages.
-# Docs: https://httpd.apache.org/docs/current/howto/custom-error.html
-ErrorDocument 404 /404.php
-ErrorDocument 403 /403.php
+# === 1. SECURITY & SERVER PROTECTION ===
 
-# Hide Apache version and OS info in responses.
-# Docs: https://httpd.apache.org/docs/current/mod/core.html#serversignature
-ServerSignature Off
-
-# Disable directory browsing/listing.
-# Docs: https://httpd.apache.org/docs/current/mod/core.html#options
+# Disable directory browsing
 Options -Indexes
 
-# Mitigate clickjacking by allowing frames only from same origin.
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Frame-Options
+# Protect sensitive files (includes Hostinger/LiteSpeed .user.ini)
+<FilesMatch "^(wp-config\.php|php\.ini|php5\.ini|install\.php|\.htaccess|\.env|\.user\.ini|\.git|readme\.html|license\.txt)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</FilesMatch>
+
+# Block XML-RPC (Comment out if using Jetpack or WP Mobile App)
+<Files xmlrpc.php>
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+</Files>
+
+# Security Headers
 <IfModule mod_headers.c>
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     Header always set X-Frame-Options "SAMEORIGIN"
-</IfModule>
-
-# Legacy XSS protection header (kept for older browsers).
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-XSS-Protection
-<IfModule mod_headers.c>
-    Header always set X-XSS-Protection "1; mode=block"
-</IfModule>
-
-# Prevent MIME type sniffing.
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/X-Content-Type-Options
-<IfModule mod_headers.c>
     Header always set X-Content-Type-Options "nosniff"
-</IfModule>
-
-# Limit referer info; balance privacy and analytics.
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Referrer-Policy
-<IfModule mod_headers.c>
     Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
 </IfModule>
 
-# Restrict Adobe Flash/PDF cross-domain data access.
-# Docs: https://owasp.org/www-project-secure-headers/#x-permitted-cross-domain-policies
-<IfModule mod_headers.c>
-    Header always set X-Permitted-Cross-Domain-Policies "none"
+# Block malicious query strings (Basic Firewall)
+# Ensures WooCommerce compatibility (avoids blocking common params)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{QUERY_STRING} (eval\(|base64_|127\.0\.0\.1|union.*select|insert.*into|update.*set) [NC]
+    RewriteRule .* - [F]
 </IfModule>
 
-# Enforce HTTPS for future visits (enable only on fully HTTPS sites).
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Strict-Transport-Security
-<IfModule mod_headers.c>
-    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload" env=HTTPS
-</IfModule>
+# === 2. REDIRECTION (SSL & WWW HANDLING) ===
 
-# Baseline CSP to auto-upgrade insecure requests (prevents mixed content).
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
-<IfModule mod_headers.c>
-    Header always set Content-Security-Policy "upgrade-insecure-requests"
-</IfModule>
-
-# Restrict powerful browser features (minimal, stable baseline).
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy
-<IfModule mod_headers.c>
-    Header always set Permissions-Policy "geolocation=(), camera=(), microphone=(), accelerometer=(), gyroscope=(), magnetometer=(), payment=(), usb=(), fullscreen=*"
-</IfModule>
-
-# ----------------------------------------------------------------------
-# | 1.1. Optional: Advanced Cross-Origin Isolation
-# |   Uncomment these headers to enable a cross-origin isolated state.
-# |   WARNING: This is a major change and can break third-party embeds
-# |   (iframes, scripts, images). Test thoroughly before production.
-# |   Docs: https://web.dev/coop-coep/
-# ----------------------------------------------------------------------
-
-# <IfModule mod_headers.c>
-#     Header always set Cross-Origin-Opener-Policy "same-origin"
-#     Header always set Cross-Origin-Embedder-Policy "require-corp"
-#     Header always set Cross-Origin-Resource-Policy "same-site"
-# </IfModule>
-
-# ----------------------------------------------------------------------
-# | 2. HTTP to HTTPS Redirection (Conditional Use)
-# |   Enable only if your platform/CDN does not already force HTTPS.
-# ----------------------------------------------------------------------
-
-# 301 redirect HTTP -> HTTPS (uncomment only if needed).
-# Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
-# <IfModule mod_rewrite.c>
-# RewriteEngine On
-# RewriteCond %{HTTPS} off
-# RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-# </IfModule>
-
-# ----------------------------------------------------------------------
-# | 3. Cross-Origin Resource Sharing (CORS) Configuration
-# ----------------------------------------------------------------------
-
-# Allow cross-origin access for typical CDN-served assets (fonts, CSS, JS, images).
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
-<IfModule mod_headers.c>
-    <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|css|js|mjs|gif|png|jpe?g|svg|svgz|ico|webp|avif)$">
-        Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
-</IfModule>
-
-# ----------------------------------------------------------------------
-# | 4. Advanced Security: Malicious Request & Bot Blocking
-# ----------------------------------------------------------------------
-
-# These rules follow WordPress .htaccess security best practices to block common threats.
-# Block common exploit patterns and sensitive file access.
-# Note: review carefully; tighten/relax based on your stack.
-# Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Block suspicious extension used by some shells.
-    RewriteRule \.php\.suspected - [F,NC,L]
+    # Force HTTPS
+    RewriteCond %{HTTPS} off
+    RewriteRule ^(.*)$ https://%{HTTP_HOST}/$1 [R=301,L]
 
-    # Block frequent reconnaissance endpoints.
-    RewriteRule ^apple-app-site-association$ - [F,NC,L]
-    RewriteRule ^autodiscover/autodiscover\.xml$ - [F,NC,L]
+    # Force NON-WWW (Default)
+    RewriteCond %{HTTP_HOST} ^www\.(.*)$ [NC]
+    RewriteRule ^(.*)$ https://%1/$1 [R=301,L]
 
-    # DO NOT block security.txt unless you intentionally do so.
-    # If you serve .well-known/security.txt, comment the next line out entirely.
-    # RewriteRule ^\.well-known/security\.txt$ - [F,NC,L]
-
-    # Prevent disclosure of WP version and direct core/script access.
-    RewriteRule ^readme\.html$ - [F,NC,L]
-
-    # Block XML-RPC (often abused). WARNING: some plugins/services (e.g., Jetpack) need it.
-    RewriteRule ^xmlrpc\.php$ - [F,NC,L]
-
-    # Block access to common sensitive backups/logs.
-    RewriteRule ^wp-config\.bak$ - [F,NC,L]
-    RewriteRule ^wp-content/debug\.log$ - [F,NC,L]
-
-    # Disallow PHP execution in uploads.
-    RewriteRule ^wp-content/uploads/.*\.(php|phps|phtml)$ - [F,NC,L]
-
-    # Disallow direct PHP execution in wp-includes.
-    RewriteRule ^wp-includes/(.*\.php)$ - [F,NC,L]
+    # Force WWW (Optional - Comment out NON-WWW block above and uncomment this)
+    # RewriteCond %{HTTP_HOST} !^www\. [NC]
+    # RewriteRule ^(.*)$ https://www.%{HTTP_HOST}/$1 [R=301,L]
 </IfModule>
 
-# ----------------------------------------------------------------------
-# | 5. Browser Caching with mod_expires
-# |   Sets 'Expires' and influences 'Cache-Control: max-age'.
-# |   This is a key part of any effort to fix .htaccess caching on WordPress.
-# ----------------------------------------------------------------------
+# === 3. PERFORMANCE (COMPRESSION) ===
 
-# Docs: https://httpd.apache.org/docs/current/mod/mod_expires.html
+# Brotli Compression (Auto-Detected)
+<IfModule mod_brotli.c>
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# GZIP Compression (Fallback)
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/x-javascript application/json application/xml image/svg+xml
+</IfModule>
+
+# === 4. PERFORMANCE (CACHING) ===
+
+# Browser Caching (Expires)
 <IfModule mod_expires.c>
     ExpiresActive On
-
-    # Safe default for uncategorized types.
     ExpiresDefault "access plus 1 month"
 
-    # Long-lived, versioned static assets (hash or version in filename recommended).
-    ExpiresByType text/css                         "access plus 1 year"
-    ExpiresByType application/javascript           "access plus 1 year"
+    # Text / HTML / JSON - Do not cache deeply to ensure fresh content
+    ExpiresByType text/html "access plus 0 seconds"
+    ExpiresByType application/json "access plus 0 seconds"
+    ExpiresByType text/xml "access plus 0 seconds"
 
-    # Images
-    ExpiresByType image/bmp                        "access plus 1 year"
-    ExpiresByType image/gif                        "access plus 1 year"
-    ExpiresByType image/jpeg                       "access plus 1 year"
-    ExpiresByType image/png                        "access plus 1 year"
-    ExpiresByType image/svg+xml                    "access plus 1 year"
-    ExpiresByType image/webp                       "access plus 1 year"
-    ExpiresByType image/avif                       "access plus 1 year"
+    # CSS / JS
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType text/javascript "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
 
-    # Fonts (modern MIME types)
-    ExpiresByType font/ttf                         "access plus 1 year"
-    ExpiresByType font/woff                        "access plus 1 year"
-    ExpiresByType font/woff2                       "access plus 1 year"
-    ExpiresByType application/vnd.ms-fontobject    "access plus 1 year"
+    # Media / Images
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/gif "access plus 1 year"
+    ExpiresByType image/webp "access plus 1 year"
+    ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType video/mp4 "access plus 1 year"
+    ExpiresByType video/webm "access plus 1 year"
 
-    # Media
-    ExpiresByType audio/ogg                        "access plus 1 year"
-    ExpiresByType video/mp4                        "access plus 1 year"
-    ExpiresByType video/ogg                        "access plus 1 year"
-    ExpiresByType video/webm                       "access plus 1 year"
-
-    # Shorter-lived items (manifests, icons, policies).
-    ExpiresByType application/manifest+json        "access plus 1 week"
-    ExpiresByType image/vnd.microsoft.icon         "access plus 1 week"
-    ExpiresByType image/x-icon                     "access plus 1 week"
-    ExpiresByType text/x-cross-domain-policy       "access plus 1 week"
-
-    # Dynamic feeds: keep relatively fresh.
-    ExpiresByType application/atom+xml             "access plus 1 hour"
-    ExpiresByType application/rdf+xml              "access plus 1 hour"
-    ExpiresByType application/rss+xml              "access plus 1 hour"
-
-    # API-type JSON: zero freshness lifetime here; see Section 7 for no-store.
-    ExpiresByType application/json                 "access plus 0 seconds"
-    ExpiresByType application/ld+json              "access plus 0 seconds"
-    ExpiresByType application/schema+json          "access plus 0 seconds"
-    ExpiresByType application/vnd.geo+json         "access plus 0 seconds"
-
-    # XML/HTML: force revalidation (also see Section 7).
-    ExpiresByType application/xml                  "access plus 0 seconds"
-    ExpiresByType text/xml                         "access plus 0 seconds"
-    ExpiresByType text/html                        "access plus 0 seconds"
-
-    # ETag policy: Disable to avoid cache conflicts in multi-node/CDN scenarios.
-    # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag
-    <IfModule mod_headers.c>
-        Header unset ETag
-    </IfModule>
-    FileETag None
+    # Fonts
+    ExpiresByType font/ttf "access plus 1 year"
+    ExpiresByType font/woff "access plus 1 year"
+    ExpiresByType font/woff2 "access plus 1 year"
 </IfModule>
 
-# ----------------------------------------------------------------------
-# | 6. Compression (GZIP / Deflate)
-# |   Compress text-based content to reduce transfer size.
-# ----------------------------------------------------------------------
-
-# Docs: https://httpd.apache.org/docs/current/mod/mod_deflate.html
-<IfModule mod_deflate.c>
-    # Text, markup, and script types.
-    AddOutputFilterByType DEFLATE text/plain
-    AddOutputFilterByType DEFLATE text/html
-    AddOutputFilterByType DEFLATE text/xml
-    AddOutputFilterByType DEFLATE text/css
-    AddOutputFilterByType DEFLATE text/vtt
-    AddOutputFilterByType DEFLATE text/x-component
-    AddOutputFilterByType DEFLATE application/xml
-    AddOutputFilterByType DEFLATE application/xhtml+xml
-    AddOutputFilterByType DEFLATE application/rss+xml
-    AddOutputFilterByType DEFLATE application/javascript
-    AddOutputFilterByType DEFLATE application/atom+xml
-    AddOutputFilterByType DEFLATE application/json
-    AddOutputFilterByType DEFLATE application/ld+json
-    AddOutputFilterByType DEFLATE application/vnd.api+json
-    AddOutputFilterByType DEFLATE image/svg+xml
-
-    # Avoid recompressing already-compressed assets (images, video, archives, docs).
-    SetEnvIfNoCase Request_URI \.(?:gif|jpe?g|png|webp|avif|mp4|webm|ogg|zip|rar|gz|tgz|bz2|pdf|xlsx?|docx?)$ no-gzip dont-vary
-
-    # Old browser quirks.
-    BrowserMatch ^Mozilla/4 gzip-only-text/html
-    BrowserMatch ^Mozilla/4\.0[678] no-gzip
-    BrowserMatch \bMSIE !no-gzip !gzip-only-text/html
-
-    # Inform proxies that response varies by Accept-Encoding.
-    # Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Vary
-    <IfModule mod_headers.c>
-        Header append Vary Accept-Encoding env=!dont-vary
-    </IfModule>
+# LiteSpeed Specific Optimizations (Hostinger & others)
+# These rules are auto-detected and only apply on LiteSpeed servers
+<IfModule LiteSpeed>
+    # LiteSpeed respects standard Apache rules above.
+    # We explicitly enable public cache lookup here for safety.
+    CacheLookup on
 </IfModule>
 
-# ----------------------------------------------------------------------
-# | 6.1. Optional: Compression (Brotli)
-# |   If your server supports Brotli, uncomment this block for better
-# |   compression ratios than GZIP. mod_brotli must be enabled.
-# ----------------------------------------------------------------------
+# === 5. WORDPRESS STANDARD ===
 
-# <IfModule mod_brotli.c>
-#     # Text, markup, and script types.
-#     AddOutputFilterByType BROTLI_COMPRESS text/plain
-#     AddOutputFilterByType BROTLI_COMPRESS text/html
-#     AddOutputFilterByType BROTLI_COMPRESS text/xml
-#     AddOutputFilterByType BROTLI_COMPRESS text/css
-#     AddOutputFilterByType BROTLI_COMPRESS text/vtt
-#     AddOutputFilterByType BROTLI_COMPRESS text/x-component
-#     AddOutputFilterByType BROTLI_COMPRESS application/xml
-#     AddOutputFilterByType BROTLI_COMPRESS application/xhtml+xml
-#     AddOutputFilterByType BROTLI_COMPRESS application/rss+xml
-#     AddOutputFilterByType BROTLI_COMPRESS application/javascript
-#     AddOutputFilterByType BROTLI_COMPRESS application/atom+xml
-#     AddOutputFilterByType BROTLI_COMPRESS application/json
-#     AddOutputFilterByType BROTLI_COMPRESS application/ld+json
-#     AddOutputFilterByType BROTLI_COMPRESS application/vnd.api+json
-#     AddOutputFilterByType BROTLI_COMPRESS image/svg+xml
-# </IfModule>
-
-# ----------------------------------------------------------------------
-# | 7. Cache-Control Header Directives (Granular Control)
-# ----------------------------------------------------------------------
-
-# Docs: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Cache-Control
-<IfModule mod_headers.c>
-    # Long-lived static assets (use hashed/versioned filenames).
-    # public + immutable prevents unnecessary revalidations during freshness lifetime.
-    <FilesMatch "\.(ico|pdf|flv|swf|js|mjs|css|gif|png|jpe?g|webp|avif|txt|woff2?|ttf|eot|svg)$">
-        Header set Cache-Control "max-age=31536000, public, immutable"
-    </FilesMatch>
-
-    # Web manifests and icons: shorter cache window.
-    <FilesMatch "\.(webmanifest|manifest|ico)$">
-        Header set Cache-Control "public, max-age=604800"
-    </FilesMatch>
-
-    # Generic JSON and HTML/XML: require revalidation by default.
-    # Note: WP REST API routes (e.g., /wp-json/...) are handled by PHP and not matched here.
-    <FilesMatch "\.(html?|xml|json)$">
-        Header set Cache-Control "max-age=0, must-revalidate"
-    </FilesMatch>
-
-    # Example pattern for API JSON files (if you serve real .json files for API).
-    # Adjust pattern to your naming convention (e.g., *.api.json).
-    <FilesMatch "\.api\.json$">
-        Header set Cache-Control "no-store"
-        Header unset ETag
-    </FilesMatch>
-
-    # Optional CORS for fonts when served from another origin (CDN, subdomain).
-    <FilesMatch "\.(ttf|woff2?|eot)$">
-        Header set Access-Control-Allow-Origin "*"
-    </FilesMatch>
-</IfModule>
-
-# ----------------------------------------------------------------------
-# | 8. Hotlink Protection (Optional)
-# ----------------------------------------------------------------------
-
-# Prevent other sites from embedding your images (replace yourdomain\.com).
-# Docs: https://httpd.apache.org/docs/current/mod/mod_rewrite.html
-# <IfModule mod_rewrite.c>
-# RewriteEngine On
-# RewriteCond %{HTTP_REFERER} !^$ [NC]
-# RewriteCond %{REQUEST_FILENAME} -f [NC]
-# RewriteCond %{REQUEST_FILENAME} \.(gif|jpe?g|png|webp|avif)$ [NC]
-# RewriteCond %{HTTP_REFERER} !^https?://([^.]+\.)?yourdomain\.com [NC]
-# RewriteRule \.(gif|jpe?g|png|webp|avif)$ - [F,NC,L]
-# </IfModule>
-
-# ----------------------------------------------------------------------
-# | 9. WordPress Rewrite Rules (Standard)
-# ----------------------------------------------------------------------
-
-# Standard pretty permalinks; do not edit unless you know what you are doing.
-# Docs: https://wordpress.org/support/article/htaccess/
+# BEGIN WordPress
 <IfModule mod_rewrite.c>
 RewriteEngine On
-# Preserve Authorization header for APIs/plugins that need it.
 RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 RewriteBase /
 RewriteRule ^index\.php$ - [L]
@@ -355,5 +125,4 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule . /index.php [L]
 </IfModule>
-
 # END WordPress
